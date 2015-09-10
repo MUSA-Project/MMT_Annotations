@@ -1,7 +1,6 @@
 package com.montimage.mmt.client.annotations.aspectj.support;
 
 
-import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.SourceLocation;
@@ -101,9 +100,13 @@ public class Log {
 		Object[] args = a.getArgs();
 		if (args == null || args.length == 0)
 			return;
-		String params = StringUtils.join(args, ", ");
-		String buf = String.format("[%s]", params);
-		as.push_back(Mask.METHOD_PARAMS, buf);
+		String params = "";
+		for(int i=0; i < args.length; i++)
+			params += ", " + args[i];
+		//remove the first ", "
+		params = params.substring(2);
+		params = "[" +  params + "]";
+		as.push_back(Mask.METHOD_PARAMS, params);
 	}
 
 	static void get_return_value(JoinPoint a, AttributeStore as) {
