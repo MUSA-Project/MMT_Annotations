@@ -4,7 +4,7 @@ This project defines a set of Java annotations that allows to monitor status of 
 
 For example, add `@Monitor` annotation before a method declaration to report the method status (when it is called, returned values, etc).
 
-The reports can be output to the standard output or sent to MMTServer by using [MMTConnector](https://github.com/hn-nguyen/MMT_Connector).
+The reports can be output to the standard output or sent to MMTServer by using [MMTConnector](https://github.com/Inter-Trust/MMT_Connector).
 
 
 **Requirements**
