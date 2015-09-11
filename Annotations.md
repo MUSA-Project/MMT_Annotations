@@ -8,7 +8,7 @@ Annotation             | Target                   | Scope     | Using mask
 [`@Ping`](#ping)       | Method                   | local     | 
 [`@Count`](#count)     | Class                    | local     |
 [`@Exclude`](#exclude) | Class, method, attribute | local     |
-[`@Tail`](#tail)       | Method                   | recursive | Mask
+[`@Tail`](#taint)       | Method                   | recursive | Mask
 
 ##Preliminaries##
 
