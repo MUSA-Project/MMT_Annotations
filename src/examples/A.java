@@ -8,6 +8,7 @@ public class A {
 	@Monitor
 	int x;
 	
+	
 	public A() {
 		x = 0;
 	}
@@ -23,6 +24,7 @@ public class A {
 	
 	public void h(){i();};
 	
+	@Monitor
 	public void i(){};
 	
 }

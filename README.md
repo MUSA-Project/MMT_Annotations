@@ -11,7 +11,7 @@ The reports can be output to the standard output or sent to MMTServer by using [
 
 
 - AspectJ
-- MMT_Connector
+- MMT_Connector (optional, if you want to report information to MMTServer)
 
 ##Quick start##
 
