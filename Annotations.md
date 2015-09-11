@@ -2,13 +2,13 @@
 
 The table lists each monitor, along with its annotation mark, application scope, and targeted source code element. Global variants exist for several monitors that can be enabled by weaving in their corresponding aspect.
 
-Annotation | Target                   | Scope     | Using mask 
----------- | ------------------------ | --------- | -------------
-`@Monitor` | Class, method, attribute | local     | Mask
-`@Ping`    | Method                   | local     | Mask
-`@Count`   | Class                    | local     |
-`@Exclude` | Class, method, attribute | local     |
-`@Tail`    | Method                   | recursive | Mask
+Annotation             | Target                   | Scope     | Using mask 
+---------------------- | ------------------------ | --------- | -------------
+[`@Monitor`](#monitor) | Class, method, attribute | local     | Mask
+[`@Ping`](#ping)       | Method                   | local     | 
+[`@Count`](#count)     | Class                    | local     |
+[`@Exclude`](#exclude) | Class, method, attribute | local     |
+[`@Tail`](#tail)       | Method                   | recursive | Mask
 
 ##Preliminaries##
 
@@ -80,7 +80,7 @@ public class A {
 }
 ```
 
-The annotations `@Count` and `@Exclude` do not need to use mask.
+Mask is used by the annotations `@Monitor` and `@Tail`.
 
 ##Annotations##
 
