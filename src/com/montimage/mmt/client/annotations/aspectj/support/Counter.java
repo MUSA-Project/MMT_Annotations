@@ -10,6 +10,8 @@ import com.montimage.mmt.client.annotations.Mask;
 // Garbage collected objects are automatically removed.
 public class Counter {
 	// Each type is tracked by a different HashMap
+	static AttributeStore as = new AttributeStore();
+	
 	@SuppressWarnings("serial")
 	static class Map extends HashMap<String, WeakHashMap<Object, Integer>> {
 		public void add(Object o, String class_id) {
@@ -34,7 +36,13 @@ public class Counter {
 	static Map map = new Map();
 	private Counter() {}
 	public static Counter singleton() {	return counter;	}
-	public void add(Object ref, String ref_class_id) {	map.add(ref, ref_class_id);	}
+	public void add(Object ref, String ref_class_id) {	
+		map.add(ref, ref_class_id);
+		
+		as = new AttributeStore();
+		map.dump(as);
+		Log.notif_counter(as);
+	}
 	public static void log(AttributeStore as) {	map.dump(as);	}
 	public static void clear() {map.clear();}
 }

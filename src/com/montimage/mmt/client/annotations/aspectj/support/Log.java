@@ -68,6 +68,9 @@ public class Log {
 		i("Notif", "Method Leave", jp, as);
 	}
 
+	public static void notif_counter( AttributeStore as ){
+		i("Notif", "Counter", null, as);
+	}
 	static String get_attribute_value(JoinPoint a) {
 		Object[] args = a.getArgs();
 		if (args == null || args.length < 1)

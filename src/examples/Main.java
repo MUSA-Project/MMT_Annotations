@@ -9,11 +9,15 @@ public class Main {
 		
 		Annotation.setMask(Mask.NAME | Mask.SOURCE_LINE | Mask.TIME_STAMP);	
 		Annotation.enableStdout(true);
-
-		MainHelper h = new MainHelper();
-		h.f();
-		h.g();
 		
-		System.out.println("Done");
+		A a = new A();
+		a.f();
+		a.g();
+		
+		A aa = new A();
+		aa.g();
+	
+		aa = new A();
+		
 	}
 }

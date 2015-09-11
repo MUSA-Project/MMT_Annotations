@@ -2,13 +2,13 @@
 
 The table lists each monitor, along with its annotation mark, application scope, and targeted source code element. Global variants exist for several monitors that can be enabled by weaving in their corresponding aspect.
 
-Annotation | Target                   | Scope     | Specification
+Annotation | Target                   | Scope     | Using mask 
 ---------- | ------------------------ | --------- | -------------
-`@Monitor` | Class, method, attribute | local     |
-`@Ping`    | Method                   | local     |
+`@Monitor` | Class, method, attribute | local     | Mask
+`@Ping`    | Method                   | local     | Mask
 `@Count`   | Class                    | local     |
 `@Exclude` | Class, method, attribute | local     |
-`@Tail`    | Method                   | recursive |
+`@Tail`    | Method                   | recursive | Mask
 
 ##Preliminaries##
 
@@ -45,9 +45,104 @@ Method Leave -- exit_status:success, duration[microsec]:3034.000, return_value:n
 
 Output is made up of name-value pairs.
 
+
+###Mask###
+
+Applications that are sensitive to disclosing information to the remote logger can configure their logging output. Applications can set a mask that controls the logging output.  Valid options are specified in `Mask` class.
+
+ID              | Description
+--------------- | ----------------------------------------------------
+ATTRIBUTE_VALUE | Value of the monitored attribute
+CLASS_ID        | Id of classes monitored by `@Count`
+CLASS_INSTANCES | Number of class instances monitored by `@Count`
+DURATION        | Method duration monitored by `@Monitor`
+EXCEPTION       | String representation of exception, thrown during execution of a monitored function.
+EXIT_STATUS     | Exit status of method
+LOG_MSG         | Description of log message 
+NAME            | Name of join point, such as function, variable, etc.
+METHOD_PARAMS   | Method parameters, disable for sensitive methods
+RETURN_VALUE    | Method return value
+SOURCE_LINE     | Source line of join point
+THREAD_COUNT    | Number of threads in current process
+THREAD_NAME     | Name of current thread
+TIME_STAMP      | Time stamp
+TRACKED_OBJECTS | Number of tracked objects
+ALL             | Union of all of the above options. Use it to subtract options with XOR
+
+By default `ALL` mask is used. You can use `|` to combine the masks as the following example:
+
+```Java
+@Monitor(Mask.NAME | Mask.SOURCE_LINE)
+public class A {
+    int a;
+    public void func() {...}
+    ...
+}
+```
+
+The annotations `@Count` and `@Exclude` do not need to use mask.
+
 ##Annotations##
 
 ###@Monitor###
+
+Using this meter you can measure
+
+- the execution time of a method and monitor its exit status,
+- changes made to attributes, and to log the new value,
+
+#####Location#####
+
+Before method or attribute declarations.
+
+You can also put this annotation before a class declaration to monitor all methods and attributes of the class.
+
+#####Reported Information#####
+
+**Application for Method monitoring**
+
+- Method start event
+- Method end event
+- Method duration
+- Exit status
+    - success –  on normal return
+    - exception_thrown – if an exception was raised
+    - exception text –  if an exception was raised
+- Status  information
+
+```Java
+public class A{
+    @Monitor
+    void func() { ... }
+}
+```
+
+In the usage sample, we annotated monitor_nested() with the @Monitor annotation. First, method monitor logs the function start event. It produces a second log event on function return, which includes the run-time duration and exit status. Because of local scope, method monitor does not track the call to nested() in the method body.
+
+```
+Method Enter -- name:examples.MainHelper.f, source:MainHelper.java:16, thread_name:main, thread_count:1, time_stamp:1441958247650
+Method Leave -- exit_status:success, duration[microsec]:3034.000, return_value:null, name:examples.MainHelper.f, source:MainHelper.java:16, thread_name:main, thread_count:1, time_stamp:1441958247662
+```
+
+**Application for Attribute monitoring**
+
+Attribute value, as returned by toString(), on each assignment operation
+
+```Java
+public class A {
+    @Monitor
+    public int x = -1;
+    @Monitor
+    private int y;
+}
+```
+
+In the usage sample, we have annotated variable x and y with the @Monitor annotation. Attribute monitor generates a log entry for the variable x, on object initialization. Later in the code, we assign y the value 3 (not shown in the usage sample), which is logged by attribute monitor. A log about y does not appear in the log either, since no value is assigned to it.
+
+```
+Attribute changed -- attribute_value:0, name:examples.A.x, source:A.java:12, thread_name:main, thread_count:1, time_stamp:1441974143556, class_id:examples.A, class_instances:2, tracked_objects:2
+Attribute changed -- attribute_value:1, name:examples.A.x, source:A.java:16, thread_name:main, thread_count:1, time_stamp:1441974143541, class_id:examples.A, class_instances:1, tracked_objects:1
+```
 
 ###@Count###
 Use the `@Count` monitor to track the number of objects on the memory heap. Count monitor increments a counter when a new object is created, and decrements the counter an object is finalized. Finalization occurs right before the garbage collector reclaims the memory allocated to the object. Each annotated class receives an individual counter.
@@ -63,6 +158,10 @@ The global object counter is increased and decreased by this meter. The object c
 ```Java
 @Count
 public class A {...}
+
+...
+A a = new A();
+a = new A();
 ```
 
 We have added the `@Count` annotation to class A. On each call of the new operator the object, its counter is incremented. Eventually, when the object is no longer referenced, the garbage collector de-allocates it.
@@ -70,7 +169,8 @@ We have added the `@Count` annotation to class A. On each call of the new operat
 We will be reported information as the following:
 
 ```
-count(test.B):1, count(test.A):1, tracked_objects:2
+Counter -- class_id:examples.A, class_instances:1, tracked_objects:1
+Counter -- class_id:examples.A, class_instances:2, tracked_objects:2
 ```
 
 ###@Ping###
@@ -87,16 +187,14 @@ On each invocation of the method a ‘Ping’ message is added to the log.
 ```Java
 public class A{
     @Ping
-    public void sayHello(){}
+    public void f(){}
 }
 ```
 
-We have annotated the receive_packet() function with the @Ping annotation. Whenever a new packet arrives, ping monitor produces a log event.
-
-The output is as the following:
+We have annotated the `f()` function with the `@Ping` annotation. Whenever this function is executed, ping monitor produces a log event as the following:
 
 ```
-Method Enter -- name:examples.MainHelper.f, source:MainHelper.java:16, thread_name:main, thread_count:1, time_stamp:1441958247650
+Ping -- name:examples.A.f, source:A.java:15, time_stamp:1441968811999
 ```
 
 ###@Exclude###
@@ -143,10 +241,10 @@ Outputs the same information as method monitor, for each method encountered by t
 
 ```Java
 public class A{
-    @Taint
-    void taint_test() { nested(); }
-    void nested()     { inner();  }
-    void inner()      {}
+    @Taint( Mask.NAME | Mask.SOURCE_LINE | Mask.DURATION | Mask.TIME_STAMP)
+    public void g() {h();};
+    public void h(){i();};
+    public void i(){};
 }
 ```
 
@@ -155,46 +253,10 @@ We have annotated `taint_test()` with the `@Taint` annotation. Taint monitor tra
 The output is as below:
 
 ```
-Method Enter -- name:A.taint_test, source:A.java:13, …
-Method Enter -- name:A.nested, source:A.java:20, …
-Method Enter -- name:A.inner, source:A.java:26, …
-Method Leave -- name:A.inner, source:A.java:26, …
-Method Leave -- name:A.nested, source:A.java:20, …
-Method Leave -- name:A.taint_test, source:A.java:13,…
+Method Enter -- name:examples.A.g, source:A.java:20, time_stamp:1441974368774
+Method Enter -- name:examples.A.h, source:A.java:23, time_stamp:1441974368774
+Method Enter -- name:examples.A.i, source:A.java:25, time_stamp:1441974368774
+Method Leave -- duration[microsec]:99.000, name:examples.A.i, source:A.java:25, time_stamp:1441974368784
+Method Leave -- duration[microsec]:10148.000, name:examples.A.h, source:A.java:23, time_stamp:1441974368784
+Method Leave -- duration[microsec]:10517.000, name:examples.A.g, source:A.java:20, time_stamp:1441974368785
 ```
-
-##Mask##
-
-Applications that are sensitive to disclosing information to the remote logger can configure their logging output. Applications can set a mask that controls the logging output.  Valid options are specified in `Mask` class.
-
-ID              | Description
---------------- | ----------------------------------------------------
-ATTRIBUTE_VALUE | Value of the monitored attribute
-CLASS_ID        | Id of classes monitored by `@Count`
-CLASS_INSTANCES | Number of class instances monitored by `@Count`
-DURATION        | Method duration monitored by `@Monitor`
-EXCEPTION       | String representation of exception, thrown during execution of a monitored function.
-EXIT_STATUS     | Exit status of method
-LOG_MSG         | Description of log message 
-NAME            | Name of join point, such as function, variable, etc.
-METHOD_PARAMS   | Method parameters, disable for sensitive methods
-RETURN_VALUE    | Method return value
-SOURCE_LINE     | Source line of join point
-THREAD_COUNT    | Number of threads in current process
-THREAD_NAME     | Name of current thread
-TIME_STAMP      | Time stamp
-TRACKED_OBJECTS | Number of tracked objects
-ALL             | Union of all of the above options. Use it to subtract options with XOR
-
-By default `ALL` mask is used. You can use `|` to combine the masks as the following example:
-
-```Java
-@Monitor(Mask.NAME | Mask.SOURCE_LINE)
-public class A {
-    int a;
-    public void func() {...}
-    ...
-}
-```
-
-The annotations `@Count` and `@Exclude` do not need to use mask.

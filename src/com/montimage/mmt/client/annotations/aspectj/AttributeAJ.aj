@@ -1,11 +1,10 @@
 package com.montimage.mmt.client.annotations.aspectj;
 
-import com.montimage.mmt.client.annotations.Mask;
 import com.montimage.mmt.client.annotations.Monitor;
 import com.montimage.mmt.client.annotations.aspectj.support.AttributeStore;
 import com.montimage.mmt.client.annotations.aspectj.support.Log;
 
-public abstract aspect AttributeAJ extends Base {
+public aspect AttributeAJ extends Base {
 	
 	// All attribute setters within @Monitor annotated class
 	/** Usage:
@@ -22,13 +21,12 @@ public abstract aspect AttributeAJ extends Base {
 	 * 
 	 */
 	pointcut monitor(Monitor m): 
-		((set(* *) && within(@Monitor *)) 
+		((set(* *) && within(@Monitor *))
 				|| set(@Monitor * *)) 
 		&& @annotation(m) 
-		&& scope();
-
+		&& scope()
+		;
 	before(Monitor m) : monitor(m) {
-		System.out.println("Mask: " + m.value() + ", name: " + Mask.getName(m.value()));
 		AttributeStore as = Log.getAttributeStore(m.value());
 		Log.notif_attribute("Attribute changed", thisJoinPoint, as);
 	}	
