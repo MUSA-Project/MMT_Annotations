@@ -57,3 +57,5 @@ public class MainHelper {
 
 
 ##Annotations##
+
+The list of annotations is presented [here](Annotations.md).

@@ -4,10 +4,9 @@ import java.security.SecureRandom;
 
 import com.montimage.mmt.client.annotations.*;
 
-@Monitor
+@Count
 public class MainHelper {
 	
-	@Count
 	public SecureRandom rndgen;
 	
 	MainHelper() {
