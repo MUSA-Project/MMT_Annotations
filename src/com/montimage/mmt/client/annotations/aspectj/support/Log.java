@@ -10,7 +10,7 @@ import com.montimage.mmt.client.connector.MMTClientConnector;
 
 public class Log {
 	static LogBuffer log_buffer;
-	static boolean stdout_enabled = false;
+	static boolean stdout_enabled = true;
 	static long log_mask = Mask.ALL;
 	static MMTClientConnector connector = null;
 
@@ -137,6 +137,8 @@ public class Log {
 	}
 
 	public static AttributeStore getAttributeStore(long mask) {
+		if( mask == Mask.ALL )
+			mask = log_mask;
 		AttributeStore a = new AttributeStore();
 		a.setLogMask(mask);
 		return a;

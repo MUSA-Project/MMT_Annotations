@@ -7,8 +7,7 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		
-		Annotation.setMask(Mask.NAME | Mask.SOURCE_LINE | Mask.TIME_STAMP);	
-		Annotation.enableStdout(true);
+		Annotation.setMask(Mask.NAME | Mask.TIME_STAMP);	
 		
 		A a = new A();
 		a.f();
