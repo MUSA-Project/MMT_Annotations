@@ -15,9 +15,9 @@ The reports can be output to the standard output or sent to MMTServer by using [
 
 ##Quick start##
 
-1. Download and install [AspectJ](https://eclipse.org/aspectj/)
+1, Download and install [AspectJ](https://eclipse.org/aspectj/)
 
-2. Create an AspectJ project containing the following code:
+2, Create an AspectJ project containing the following code:
 
 To start using the MMTAnnotations, you have to initialize it in the start-up section of your code. The following snippet shows how to do this.
 
@@ -79,9 +79,9 @@ public class A {
 }
 ```
 
-3. Download and add [`mmt-annotation-1.0.jar`](blob/master/distribution/mmt-annotation-1.0.jar) in the `Aspect Path` of the project.
+3, Download and add [`mmt-annotation-1.0.jar`](distribution/mmt-annotation-1.0.jar) in the `Aspect Path` of the project.
 
-4. Build and run project, we will obtain an output as the following:
+4, Build and run project, we will obtain an output as the following:
 
 ```
 Counter -- class_id:examples.A, class_instances:1, tracked_objects:1
