@@ -1,6 +1,6 @@
 #List of Annotations#
 
-The table lists each monitor, along with its annotation mark, application scope, and targeted source code element. Global variants exist for several monitors that can be enabled by weaving in their corresponding aspect.
+The table lists each monitor, along with its annotation mask, application scope, and targeted source code element. Global variants exist for several monitors that can be enabled by weaving in their corresponding aspect.
 
 Annotation             | Target                   | Scope     | Using mask 
 ---------------------- | ------------------------ | --------- | -------------
